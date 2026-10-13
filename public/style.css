@@ -1,0 +1,14 @@
+/* Custom application overrides and smooth transitions */
+body {
+    background-color: #f9fafb;
+    color: #111827;
+}
+
+textarea {
+    resize: vertical;
+}
+
+.mermaid svg {
+    max-width: 100%;
+    height: auto;
+}
