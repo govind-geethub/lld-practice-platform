@@ -2,97 +2,136 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>LLD Practice Platform - Elite MVP</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LLD Practice Platform - Engineering Practice & Feedback</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
     <link rel="stylesheet" href="/static/style.css">
-    <script>mermaid.initialize({ startOnLoad: false });</script>
+    <script>mermaid.initialize({ startOnLoad: false, theme: 'neutral' });</script>
 </head>
-<body class="bg-gray-50 text-gray-900 font-sans">
-    <div class="max-w-6xl mx-auto p-6">
-        <header class="mb-8 border-b pb-4 flex justify-between items-center">
+<body class="bg-slate-50 text-slate-900 font-sans antialiased">
+    <div class="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
+        <!-- Header -->
+        <header class="mb-8 border-b border-slate-200 pb-5 flex flex-col md:flex-row md:justify-between md:items-center gap-4">
             <div>
-                <h1 class="text-3xl font-extrabold text-blue-600">LLD Practice Platform</h1>
-                <p class="text-sm text-gray-600">Industrial-Grade Low-Level Design Evaluation & Feedback Engine</p>
+                <div class="flex items-center gap-3">
+                    <div class="bg-blue-600 text-white p-2 rounded-xl shadow-md">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-black tracking-tight text-slate-900">LLD Practice Platform</h1>
+                        <p class="text-xs text-slate-500 font-medium">Explainable, Rubric-Driven Architecture & Object-Oriented Feedback</p>
+                    </div>
+                </div>
             </div>
-            <div class="flex gap-2">
-                <span class="bg-blue-100 text-blue-800 text-xs font-semibold px-3 py-1 rounded-full">Monolith Architecture</span>
-                <span class="bg-emerald-100 text-emerald-800 text-xs font-semibold px-3 py-1 rounded-full">Hybrid Evaluation Active</span>
+            <div class="flex flex-wrap gap-2 text-xs">
+                <span class="bg-blue-50 text-blue-700 border border-blue-200 font-semibold px-3 py-1 rounded-full">Practice Loop MVP</span>
+                <span class="bg-emerald-50 text-emerald-700 border border-emerald-200 font-semibold px-3 py-1 rounded-full">Rubric-Driven Evaluation</span>
+                <span class="bg-purple-50 text-purple-700 border border-purple-200 font-semibold px-3 py-1 rounded-full">Resilient Pipeline</span>
             </div>
         </header>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <!-- Problem List -->
-            <div class="bg-white p-4 rounded-xl shadow-sm border">
-                <h2 class="text-lg font-bold mb-4">Select LLD Problem</h2>
-                <div id="problem-list" class="space-y-3"></div>
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <!-- Problem Selector (3 cols) -->
+            <div class="lg:col-span-3">
+                <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 sticky top-6">
+                    <h2 class="text-sm font-bold uppercase tracking-wider text-slate-500 mb-3">1. Select LLD Problem</h2>
+                    <div id="problem-list" class="space-y-2.5"></div>
+                </div>
             </div>
 
-            <!-- Workspace -->
-            <div class="md:col-span-2 bg-white p-6 rounded-xl shadow-sm border">
-                <h2 id="current-problem-title" class="text-xl font-bold mb-2">Select a problem to start</h2>
-                <p id="current-problem-desc" class="text-sm text-gray-600 mb-4"></p>
+            <!-- Workspace & Evaluation (9 cols) -->
+            <div class="lg:col-span-9 space-y-6">
+                <!-- Active Problem Overview -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                    <div class="flex justify-between items-start mb-2">
+                        <div>
+                            <span class="text-xs font-semibold text-blue-600 uppercase tracking-wider">Current Challenge</span>
+                            <h2 id="current-problem-title" class="text-xl font-bold text-slate-900">Select a problem to start</h2>
+                        </div>
+                        <span id="current-problem-diff" class="text-xs px-2.5 py-1 rounded-full font-bold"></span>
+                    </div>
+                    <p id="current-problem-desc" class="text-sm text-slate-600 mb-5 leading-relaxed"></p>
 
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-semibold mb-1">Class Design / Code Solution</label>
-                        <textarea id="code-input" rows="8" class="w-full font-mono text-sm p-3 border rounded-lg bg-gray-900 text-green-400" placeholder="Write classes, interfaces, methods..."></textarea>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-semibold mb-1">Architectural Notes & Trade-offs (Mention concurrency/threads)</label>
-                        <textarea id="design-notes" rows="3" class="w-full text-sm p-3 border rounded-lg" placeholder="Explain design patterns used, thread-safety, and trade-offs..."></textarea>
-                    </div>
-                    <div class="flex justify-between items-center">
-                        <button onclick="submitSolution()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg font-semibold text-sm transition shadow-md">Submit & Evaluate Design</button>
-                        <button onclick="exportReport()" id="export-btn" class="hidden bg-gray-800 hover:bg-gray-900 text-white px-4 py-2.5 rounded-lg text-sm transition">📥 Export Markdown Report</button>
+                    <!-- Submission Input -->
+                    <div class="space-y-4">
+                        <div>
+                            <div class="flex justify-between items-center mb-1.5">
+                                <label class="text-xs font-bold uppercase tracking-wider text-slate-700">Class Design / Code (OOP & Interfaces)</label>
+                                <span class="text-xs text-slate-400 font-mono">Format: Code / Skeleton</span>
+                            </div>
+                            <textarea id="code-input" rows="9" class="w-full font-mono text-xs sm:text-sm p-4 border border-slate-800 rounded-xl bg-slate-900 text-emerald-400 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-inner" placeholder="Write class hierarchies, interfaces, methods..."></textarea>
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between items-center mb-1.5">
+                                <label class="text-xs font-bold uppercase tracking-wider text-slate-700">Architectural Notes & Trade-Offs</label>
+                                <span class="text-xs text-slate-400">Mention concurrency, design patterns, and assumptions</span>
+                            </div>
+                            <textarea id="design-notes" rows="3" class="w-full text-xs sm:text-sm p-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="E.g., Used Strategy pattern for flexible pricing, added Mutex lock on booking seats to prevent race conditions..."></textarea>
+                        </div>
+
+                        <div class="flex flex-wrap justify-between items-center pt-2 gap-3">
+                            <button onclick="submitSolution()" id="submit-btn" class="bg-blue-600 hover:bg-blue-700 active:scale-95 text-white px-6 py-2.5 rounded-xl font-semibold text-sm transition shadow-md shadow-blue-500/20 flex items-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                                <span>Submit for Rubric Evaluation</span>
+                            </button>
+                            <button onclick="exportReport()" id="export-btn" class="hidden bg-slate-800 hover:bg-slate-900 text-white px-4 py-2.5 rounded-xl text-xs font-semibold transition flex items-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                                <span>Export Markdown Report</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Feedback Area -->
-                <div id="feedback-section" class="mt-8 hidden border-t pt-6">
+                <!-- Structured Feedback Section (Visible after submit) -->
+                <div id="feedback-section" class="hidden bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-6">
+                    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center pb-4 border-b border-slate-100 gap-2">
+                        <div>
+                            <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Structured Evaluation</span>
+                            <h3 class="text-xl font-bold text-slate-900">Explainable Design Scorecard</h3>
+                        </div>
+                        <div id="score-badge" class="px-4 py-1.5 rounded-full font-bold text-base inline-block text-center"></div>
+                    </div>
+
+                    <!-- Helping Guide 5-Point Dimensional Rubric Grid -->
+                    <div>
+                        <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3">Multi-Dimensional Rubric Assessment</h4>
+                        <div id="rubric-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <!-- Populated dynamically via app.js -->
+                        </div>
+                    </div>
+
+                    <!-- Architectural Critique Points -->
+                    <div>
+                        <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Key Engineering Critiques:</h4>
+                        <ul id="feedback-list" class="space-y-2 text-sm text-slate-700 bg-slate-50 p-4 rounded-xl border border-slate-200"></ul>
+                    </div>
+
+                    <!-- Dynamic UML Diagram -->
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500">Extracted Architecture (Dynamic UML)</h4>
+                            <span class="text-xs text-slate-400">Parsed from your actual code</span>
+                        </div>
+                        <div class="bg-white border border-slate-200 p-4 rounded-xl overflow-x-auto flex justify-center shadow-inner">
+                            <div class="mermaid text-center" id="uml-diagram"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Attempt History & Learning Loop -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
                     <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-lg font-bold">Evaluation Scorecard</h3>
-                        <div id="score-badge" class="px-4 py-1.5 rounded-full font-bold text-base"></div>
-                    </div>
-
-                    <!-- Multi-Axis Breakdown -->
-                    <div class="grid grid-cols-3 gap-4 mb-6 bg-gray-50 p-4 rounded-xl border">
                         <div>
-                            <span class="text-xs font-semibold text-gray-600">SOLID Principles</span>
-                            <div class="w-full bg-gray-200 rounded-full h-2.5 mt-1">
-                                <div id="bar-solid" class="bg-blue-600 h-2.5 rounded-full" style="width: 0%"></div>
-                            </div>
-                            <span id="val-solid" class="text-xs font-bold text-gray-700 mt-1 inline-block">0%</span>
+                            <h3 class="text-base font-bold text-slate-900">Iterative Attempt History</h3>
+                            <p class="text-xs text-slate-500">Track your progress and design evolution across multiple attempts</p>
                         </div>
-                        <div>
-                            <span class="text-xs font-semibold text-gray-600">Design Patterns</span>
-                            <div class="w-full bg-gray-200 rounded-full h-2.5 mt-1">
-                                <div id="bar-pattern" class="bg-purple-600 h-2.5 rounded-full" style="width: 0%"></div>
-                            </div>
-                            <span id="val-pattern" class="text-xs font-bold text-gray-700 mt-1 inline-block">0%</span>
-                        </div>
-                        <div>
-                            <span class="text-xs font-semibold text-gray-600">Concurrency Safety</span>
-                            <div class="w-full bg-gray-200 rounded-full h-2.5 mt-1">
-                                <div id="bar-concurrency" class="bg-emerald-600 h-2.5 rounded-full" style="width: 0%"></div>
-                            </div>
-                            <span id="val-concurrency" class="text-xs font-bold text-gray-700 mt-1 inline-block">0%</span>
-                        </div>
+                        <span id="attempt-count" class="text-xs bg-slate-100 text-slate-700 px-2.5 py-1 rounded-full font-semibold">0 Attempts</span>
                     </div>
-
-                    <h4 class="font-semibold text-sm mb-2">Detailed Architectural Critique:</h4>
-                    <ul id="feedback-list" class="list-disc list-inside space-y-1.5 text-sm text-gray-700 mb-6"></ul>
-
-                    <h4 class="font-semibold text-sm mb-2">Generated UML Class Diagram:</h4>
-                    <div class="bg-white border p-4 rounded-xl overflow-x-auto flex justify-center">
-                        <div class="mermaid" id="uml-diagram"></div>
-                    </div>
-                </div>
-
-                <!-- History Area -->
-                <div class="mt-8 border-t pt-6">
-                    <h3 class="text-lg font-bold mb-3">Attempt History</h3>
-                    <div id="history-list" class="space-y-2 text-sm"></div>
+                    <div id="history-list" class="space-y-3 text-sm"></div>
                 </div>
             </div>
         </div>

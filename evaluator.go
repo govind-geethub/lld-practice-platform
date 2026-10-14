@@ -1,18 +1,33 @@
 package main
 
 import (
+	"context"
+	"fmt"
+	"regexp"
 	"strings"
+	"time"
 )
 
-func evaluateDesign(problemID int, code, notes string) EvaluationResult {
-	codeLower := strings.ToLower(code)
-	notesLower := strings.ToLower(notes)
+// ==============================================================================
+// 1. DETERMINISTIC EVALUATOR
+// Evaluates syntax validity, domain presence, anti-patterns, and basic structure.
+// ==============================================================================
 
-	// Strict Independent Validation for Code and Notes
+type DeterministicEvaluator struct{}
+
+func (e *DeterministicEvaluator) Name() string {
+	return "Deterministic Rule Engine"
+}
+
+func (e *DeterministicEvaluator) Evaluate(ctx context.Context, sub Submission, prob Problem) (EvaluationResult, error) {
+	codeLower := strings.ToLower(sub.CodeContent)
+	notesLower := strings.ToLower(sub.DesignNotes)
+
+	// Validate problem domain presence
 	codeValid := false
 	notesValid := false
 
-	switch problemID {
+	switch prob.ID {
 	case 1: // Parking Lot
 		codeValid = strings.Contains(codeLower, "parking") || strings.Contains(codeLower, "spot") || strings.Contains(codeLower, "vehicle")
 		notesValid = strings.Contains(notesLower, "parking") || strings.Contains(notesLower, "spot") || strings.Contains(notesLower, "pricing")
@@ -31,80 +46,294 @@ func evaluateDesign(problemID int, code, notes string) EvaluationResult {
 	case 6: // Movie Ticket Booking
 		codeValid = strings.Contains(codeLower, "seat") || strings.Contains(codeLower, "booking") || strings.Contains(codeLower, "payment")
 		notesValid = strings.Contains(notesLower, "seat") || strings.Contains(notesLower, "booking") || strings.Contains(notesLower, "payment")
+	default:
+		codeValid = len(sub.CodeContent) > 20
+		notesValid = len(sub.DesignNotes) > 10
 	}
 
-	// Hard rejection if either the code or the notes mismatch the selected problem domain
+	// Mismatch rejection
 	if !codeValid || !notesValid {
 		var reason string
 		if !codeValid && !notesValid {
-			reason = "Both implementation code and architectural notes belong to a different domain."
+			reason = "Neither the code implementation nor the architectural notes match the problem domain."
 		} else if !codeValid {
-			reason = "Implementation code does not match the selected problem domain."
+			reason = "Code implementation does not reflect the selected problem requirements."
 		} else {
-			reason = "Architectural notes belong to a different problem domain."
+			reason = "Architectural notes do not address the selected problem domain."
 		}
 
 		return EvaluationResult{
+			Status:       StatusCompleted,
 			OverallScore: 0,
-			SolidScore:   0,
-			PatternScore: 0,
-			Concurrency:  0,
+			RubricDimensions: []RubricDimension{
+				{
+					Criterion:  "Domain Relevance & Problem Alignment",
+					Score:      0,
+					MaxScore:   5,
+					Evidence:   "Keywords scanned for " + prob.Title + " were missing or completely mismatched.",
+					Concern:    reason,
+					Suggestion: "Ensure both your class definitions and notes specifically target " + prob.Title + ".",
+					Confidence: "High",
+				},
+			},
 			Critique: []string{
 				"❌ Critical Domain Mismatch: " + reason,
-				"🚫 Strict One-to-One Enforcement: Mixing code from one problem with notes from another is prohibited.",
-				"💡 Action Required: Ensure both your code and notes explicitly target the selected problem.",
+				"🚫 Prevention of cross-problem contamination active.",
+				"💡 Provide domain-specific entities (e.g. for " + prob.Title + ").",
 			},
-			MermaidChart: "classDiagram\n    class RejectedSubmission {\n        <<mismatch>>\n        +status: Failed\n        +reason: Cross-Problem Contamination\n    }",
+			MermaidChart:  "classDiagram\n    class RejectedSubmission {\n        <<mismatch>>\n        +status: Failed\n        +reason: Cross-Problem Contamination\n    }",
+			EvaluatorName: e.Name(),
+			EvaluatedAt:   time.Now(),
+		}, nil
+	}
+
+	// Dynamic class/interface extraction for Mermaid diagram
+	mermaidChart := generateDynamicUML(sub.CodeContent)
+
+	// Multi-dimensional Rubric Scoring (1 to 5 scale each, normalized to 100)
+	var dimensions []RubricDimension
+	var critiques []string
+
+	// 1. Single Responsibility & Class Cohesion
+	srpScore := 3
+	srpEvidence := "Basic class structure defined."
+	srpConcern := "Check if god classes exist combining data storage and processing."
+	srpSuggestion := "Segregate high-level managers from low-level entities."
+
+	if strings.Contains(codeLower, "manager") || strings.Contains(codeLower, "controller") || strings.Contains(codeLower, "service") {
+		srpScore = 4
+		srpEvidence = "Clear orchestration layer detected separating coordination from core domain models."
+		srpConcern = "Ensure orchestration classes don't absorb entity-specific business logic."
+		srpSuggestion = "Keep state mutation inside the entity itself."
+		critiques = append(critiques, "✅ Good separation of control logic from domain entities.")
+	} else {
+		critiques = append(critiques, "⚠️ Consider introducing a dedicated coordinator or service class to own system workflows.")
+	}
+	dimensions = append(dimensions, RubricDimension{
+		Criterion:  "Single Responsibility & Cohesion",
+		Score:      srpScore,
+		MaxScore:   5,
+		Evidence:   srpEvidence,
+		Concern:    srpConcern,
+		Suggestion: srpSuggestion,
+		Confidence: "High",
+	})
+
+	// 2. Abstraction & Interface Segregation (DIP & ISP)
+	absScore := 2
+	absEvidence := "Concrete classes used directly."
+	absConcern := "Components are tightly coupled to concrete implementations."
+	absSuggestion := "Introduce interfaces for extensible components (e.g. strategies, repositories)."
+
+	if strings.Contains(sub.CodeContent, "interface") || strings.Contains(sub.CodeContent, "abstract") || strings.Contains(sub.CodeContent, "virtual") {
+		absScore = 5
+		absEvidence = "Explicit interfaces/abstract definitions found in class hierarchy."
+		absConcern = "None observed at interface boundary."
+		absSuggestion = "Program to interfaces at all dependency injection points."
+		critiques = append(critiques, "✅ Excellent use of interfaces for loose coupling (DIP).")
+	} else {
+		critiques = append(critiques, "⚠️ Tightly coupled to concrete classes. Extract interfaces for components that vary.")
+	}
+	dimensions = append(dimensions, RubricDimension{
+		Criterion:  "Abstraction & Loose Coupling",
+		Score:      absScore,
+		MaxScore:   5,
+		Evidence:   absEvidence,
+		Concern:    absConcern,
+		Suggestion: absSuggestion,
+		Confidence: "High",
+	})
+
+	// 3. Design Patterns & Extensibility
+	patScore := 2
+	patEvidence := "Ad-hoc conditional logic detected."
+	patConcern := "Adding new behaviors may require modifying existing code (violating OCP)."
+	patSuggestion := "Utilize behavioral patterns (Strategy, State, Observer) to allow extension without modification."
+
+	patternsFound := []string{}
+	for _, p := range []string{"Strategy", "Factory", "Singleton", "State", "Observer", "Command", "Builder"} {
+		if strings.Contains(sub.CodeContent, p) || strings.Contains(sub.DesignNotes, p) {
+			patternsFound = append(patternsFound, p)
+		}
+	}
+	if len(patternsFound) > 0 {
+		patScore = 4
+		if len(patternsFound) >= 2 {
+			patScore = 5
+		}
+		patEvidence = fmt.Sprintf("Recognized design pattern(s) applied: %s.", strings.Join(patternsFound, ", "))
+		patConcern = "Ensure patterns are not over-engineered for simple operations."
+		patSuggestion = "Document why each pattern was chosen over simpler alternatives."
+		critiques = append(critiques, fmt.Sprintf("✅ Applied appropriate design patterns: %s.", strings.Join(patternsFound, ", ")))
+	} else {
+		critiques = append(critiques, "⚠️ Design lacks explicit design patterns (e.g. Strategy for algorithms, State for lifecycles).")
+	}
+	dimensions = append(dimensions, RubricDimension{
+		Criterion:  "Design Patterns & Extensibility",
+		Score:      patScore,
+		MaxScore:   5,
+		Evidence:   patEvidence,
+		Concern:    patConcern,
+		Suggestion: patSuggestion,
+		Confidence: "High",
+	})
+
+	// 4. Concurrency Safety & State Handling
+	conScore := 2
+	conEvidence := "No synchronization or thread-safety considerations mentioned."
+	conConcern := "High risk of race conditions or data inconsistency under concurrent operations."
+	conSuggestion := "Specify synchronization mechanisms (Mutex, Synchronized blocks, Atomic references) in critical sections."
+
+	if strings.Contains(notesLower, "mutex") || strings.Contains(notesLower, "lock") || strings.Contains(notesLower, "thread-safe") ||
+		strings.Contains(notesLower, "concurrent") || strings.Contains(codeLower, "mutex") || strings.Contains(codeLower, "synchronized") {
+		conScore = 5
+		conEvidence = "Concurrency hazards addressed with explicit locking/thread-safety mechanisms."
+		conConcern = "Watch out for potential deadlocks or lock contention under high load."
+		conSuggestion = "Consider read-write locks (RWMutex) or optimistic locking for read-heavy flows."
+		critiques = append(critiques, "✅ Strong architectural consideration for concurrency and synchronization.")
+	} else {
+		critiques = append(critiques, "⚠️ Concurrency omitted: Clarify how concurrent requests or state updates are made thread-safe.")
+	}
+	dimensions = append(dimensions, RubricDimension{
+		Criterion:  "Concurrency Safety & State Management",
+		Score:      conScore,
+		MaxScore:   5,
+		Evidence:   conEvidence,
+		Concern:    conConcern,
+		Suggestion: conSuggestion,
+		Confidence: "High",
+	})
+
+	// Calculate overall score (normalized to 100)
+	totalScore := 0
+	for _, d := range dimensions {
+		totalScore += d.Score
+	}
+	overall := int(float64(totalScore) / float64(len(dimensions)*5) * 100)
+
+	return EvaluationResult{
+		Status:           StatusCompleted,
+		OverallScore:     overall,
+		RubricDimensions: dimensions,
+		Critique:         critiqueSummary(critiques),
+		MermaidChart:     mermaidChart,
+		EvaluatorName:    e.Name(),
+		EvaluatedAt:      time.Now(),
+	}, nil
+}
+
+// ==============================================================================
+// 2. COMPOSITE / PIPELINE EVALUATOR
+// Satisfies Change Test B: easily chain multiple evaluators (Rule engine + AI/Mock)
+// ==============================================================================
+
+type CompositeEvaluator struct {
+	evaluators []Evaluator
+}
+
+func NewDefaultCompositeEvaluator() *CompositeEvaluator {
+	return &CompositeEvaluator{
+		evaluators: []Evaluator{
+			&DeterministicEvaluator{},
+		},
+	}
+}
+
+func (c *CompositeEvaluator) Name() string {
+	return "Composite Hybrid Pipeline"
+}
+
+func (c *CompositeEvaluator) AddEvaluator(e Evaluator) {
+	c.evaluators = append(c.evaluators, e)
+}
+
+func (c *CompositeEvaluator) Evaluate(ctx context.Context, sub Submission, prob Problem) (EvaluationResult, error) {
+	if len(c.evaluators) == 0 {
+		return EvaluationResult{}, fmt.Errorf("no evaluators registered in pipeline")
+	}
+
+	// Run primary evaluator
+	primary := c.evaluators[0]
+	res, err := primary.Evaluate(ctx, sub, prob)
+	if err != nil {
+		return EvaluationResult{}, err
+	}
+
+	// If rejected by deterministic filter, return early
+	if res.OverallScore == 0 {
+		return res, nil
+	}
+
+	// Chain additional evaluators if registered (e.g. LLMEvaluator or MockAIEvaluator)
+	for _, nextEval := range c.evaluators[1:] {
+		nextRes, err := nextEval.Evaluate(ctx, sub, prob)
+		if err == nil {
+			// Merge critiques and dimensions
+			res.Critique = append(res.Critique, nextRes.Critique...)
+			res.RubricDimensions = append(res.RubricDimensions, nextRes.RubricDimensions...)
 		}
 	}
 
-	// Normal Evaluation Pipeline for valid matching submissions
-	solid := 70
-	patterns := 65
-	concurrency := 60
-	critique := []string{}
+	return res, nil
+}
 
-	if strings.Contains(code, "interface") || strings.Contains(code, "abstract") || strings.Contains(code, "virtual") {
-		solid += 25
-		critique = append(critique, "✅ Excellent use of interfaces/abstractions for decoupling.")
-	} else {
-		critique = append(critique, "⚠️ Consider introducing interfaces to adhere to the Dependency Inversion Principle.")
+// ==============================================================================
+// 3. DYNAMIC UML CLASS PARSER
+// Parses actual classes and interfaces from learner's code to build Mermaid diagram
+// ==============================================================================
+
+func generateDynamicUML(code string) string {
+	classRegex := regexp.MustCompile(`(?m)(?:class|interface)\s+([A-Za-z0-9_]+)`)
+	matches := classRegex.FindAllStringSubmatch(code, -1)
+
+	var sb strings.Builder
+	sb.WriteString("classDiagram\n")
+
+	classNames := make(map[string]bool)
+	var orderedNames []string
+
+	for _, m := range matches {
+		if len(m) > 1 {
+			name := m[1]
+			if !classNames[name] {
+				classNames[name] = true
+				orderedNames = append(orderedNames, name)
+			}
+		}
 	}
 
-	if strings.Contains(code, "Strategy") || strings.Contains(code, "Factory") || strings.Contains(code, "Singleton") || strings.Contains(code, "State") {
-		patterns += 30
-		critique = append(critique, "✅ Detected recognized design patterns.")
-	} else {
-		critique = append(critique, "⚠️ Explicitly highlight design patterns.")
+	if len(orderedNames) == 0 {
+		sb.WriteString("    class System {\n        +execute()\n    }\n")
+		return sb.String()
 	}
 
-	if strings.Contains(notesLower, "mutex") || strings.Contains(notesLower, "concurrent") || strings.Contains(notesLower, "thread-safe") || strings.Contains(notesLower, "lock") || strings.Contains(codeLower, "mutex") || strings.Contains(codeLower, "lock") {
-		concurrency += 35
-		critique = append(critique, "✅ Strong architectural consideration for thread-safety and concurrency.")
-	} else {
-		critique = append(critique, "⚠️ Elaborate on concurrency management in your design notes.")
+	for _, name := range orderedNames {
+		isInterface := strings.Contains(code, "interface "+name)
+		sb.WriteString(fmt.Sprintf("    class %s {\n", name))
+		if isInterface {
+			sb.WriteString("        <<interface>>\n")
+		}
+		sb.WriteString("    }\n")
 	}
 
-	if solid > 100 {
-		solid = 100
-	}
-	if patterns > 100 {
-		patterns = 100
-	}
-	if concurrency > 100 {
-		concurrency = 100
+	// Link first orchestrator to subsequent classes if > 1
+	if len(orderedNames) > 1 {
+		root := orderedNames[0]
+		for _, dep := range orderedNames[1:] {
+			if strings.Contains(dep, "Strategy") || strings.Contains(dep, "State") || strings.Contains(dep, "Handler") {
+				sb.WriteString(fmt.Sprintf("    %s ..> %s : depends on\n", root, dep))
+			} else {
+				sb.WriteString(fmt.Sprintf("    %s --> %s : manages\n", root, dep))
+			}
+		}
 	}
 
-	overall := (solid + patterns + concurrency) / 3
+	return sb.String()
+}
 
-	mermaid := "classDiagram\n    class CoreManager {\n        +getInstance()\n        +processRequest()\n    }\n    class StrategyInterface {\n        <<interface>>\n        +execute()\n    }\n    CoreManager --> StrategyInterface : uses"
-
-	return EvaluationResult{
-		OverallScore: overall,
-		SolidScore:   solid,
-		PatternScore: patterns,
-		Concurrency:  concurrency,
-		Critique:     critique,
-		MermaidChart: mermaid,
+func critiqueSummary(critiques []string) []string {
+	if len(critiques) == 0 {
+		return []string{"Submission reviewed. Solid baseline architecture."}
 	}
+	return critiques
 }

@@ -29,6 +29,7 @@ func initDB() {
 		problem_id INTEGER,
 		code_content TEXT,
 		design_notes TEXT,
+		status TEXT DEFAULT 'COMPLETED',
 		score INTEGER,
 		feedback TEXT,
 		created_at DATETIME
@@ -38,6 +39,9 @@ func initDB() {
 	if err != nil {
 		log.Fatalf("Failed to initialize tables: %v", err)
 	}
+
+	// Ensure status column exists if table was previously created without it
+	db.Exec("ALTER TABLE attempts ADD COLUMN status TEXT DEFAULT 'COMPLETED'")
 
 	var count int
 	db.QueryRow("SELECT COUNT(*) FROM problems").Scan(&count)

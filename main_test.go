@@ -1,15 +1,26 @@
 package main
 
 import (
+	"context"
 	"testing"
 )
 
-func TestEvaluateDesign(t *testing.T) {
-	code := "class ParkingLot { interface SlotSelector {} }"
-	notes := "Used Strategy pattern for pricing and handled concurrent thread-safe mutex locks."
+func TestEvaluateDesignLegacyCompatibility(t *testing.T) {
+	eval := &DeterministicEvaluator{}
+	sub := Submission{
+		ProblemID:   1,
+		CodeContent: "class ParkingLot { interface SlotSelector {} }",
+		DesignNotes: "Used Strategy pattern for pricing and handled concurrent thread-safe mutex locks.",
+	}
+	prob := Problem{
+		ID:    1,
+		Title: "Parking Lot",
+	}
 
-	// Pass problemID = 1 as the first argument
-	result := evaluateDesign(1, code, notes)
+	result, err := eval.Evaluate(context.Background(), sub, prob)
+	if err != nil {
+		t.Fatalf("Evaluation failed: %v", err)
+	}
 
 	if result.OverallScore < 70 {
 		t.Errorf("Expected passing score, got %d", result.OverallScore)
