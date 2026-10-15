@@ -6,7 +6,7 @@
     <title>LLD Practice Platform - Engineering Practice & Feedback</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
-    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="style.css">
     <script>mermaid.initialize({ startOnLoad: false, theme: 'neutral' });</script>
 </head>
 <body class="bg-slate-50 text-slate-900 font-sans antialiased">
@@ -37,7 +37,11 @@
             <!-- Problem Selector (3 cols) -->
             <div class="lg:col-span-3">
                 <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 sticky top-6">
-                    <h2 class="text-sm font-bold uppercase tracking-wider text-slate-500 mb-3">1. Select LLD Problem</h2>
+                    <div class="flex justify-between items-center mb-3">
+                        <h2 class="text-sm font-bold uppercase tracking-wider text-slate-500">1. Select LLD Problem</h2>
+                        <span id="connection-status" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 border border-slate-200">Connecting...</span>
+                    </div>
+                    <div id="status-banner" class="hidden mb-3 p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-800 leading-relaxed"></div>
                     <div id="problem-list" class="space-y-2.5"></div>
                 </div>
             </div>
@@ -138,6 +142,6 @@
     </div>
 
     <!-- External JavaScript File -->
-    <script src="/static/app.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>

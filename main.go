@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 )
 
 var defaultEvaluator Evaluator
@@ -20,7 +21,16 @@ func main() {
 
 	app := fiber.New()
 
+	// Enable CORS for all origins so API can be queried from file:// or dev servers
+	app.Use(cors.New(cors.Config{
+		AllowOrigins: "*",
+		AllowHeaders: "Origin, Content-Type, Accept",
+		AllowMethods: "GET, POST, HEAD, PUT, DELETE, PATCH, OPTIONS",
+	}))
+
+	// Serve static assets both from /static and root /
 	app.Static("/static", "./public")
+	app.Static("/", "./public")
 
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.SendFile("./public/index.html")
@@ -34,7 +44,7 @@ func main() {
 		}
 		defer rows.Close()
 
-		var problems []Problem
+		problems := []Problem{}
 		for rows.Next() {
 			var p Problem
 			if err := rows.Scan(&p.ID, &p.Title, &p.Difficulty, &p.Description, &p.Skeleton); err != nil {
@@ -123,7 +133,7 @@ func main() {
 		}
 		defer rows.Close()
 
-		var attempts []Attempt
+		attempts := []Attempt{}
 		for rows.Next() {
 			var a Attempt
 			var feedbackStr string
