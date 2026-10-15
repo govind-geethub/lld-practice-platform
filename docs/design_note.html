@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Design Note: Low-Level Design Practice Platform</title>
+<style>
+  @page {
+    size: A4;
+    margin: 16mm 18mm;
+  }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: #1e293b;
+    line-height: 1.5;
+    font-size: 10pt;
+    margin: 0;
+    padding: 0;
+  }
+  .header {
+    border-bottom: 2.5px solid #2563eb;
+    padding-bottom: 8px;
+    margin-bottom: 14px;
+  }
+  h1 {
+    font-size: 17pt;
+    color: #0f172a;
+    margin: 0 0 4px 0;
+    letter-spacing: -0.02em;
+    font-weight: 800;
+  }
+  .meta {
+    font-size: 9pt;
+    color: #64748b;
+    display: flex;
+    gap: 20px;
+  }
+  .meta strong { color: #334155; }
+  h2 {
+    font-size: 12pt;
+    color: #1e3a8a;
+    border-left: 3.5px solid #2563eb;
+    padding-left: 8px;
+    margin: 14px 0 6px 0;
+    font-weight: 700;
+  }
+  h3 {
+    font-size: 10.5pt;
+    color: #0f172a;
+    margin: 10px 0 4px 0;
+    font-weight: 700;
+  }
+  p {
+    margin: 0 0 6px 0;
+  }
+  ul {
+    margin: 0 0 8px 0;
+    padding-left: 18px;
+  }
+  li {
+    margin-bottom: 3px;
+  }
+  pre, code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 8.5pt;
+  }
+  pre {
+    background-color: #0f172a;
+    color: #38bdf8;
+    padding: 10px 12px;
+    border-radius: 6px;
+    overflow-x: auto;
+    margin: 8px 0;
+    line-height: 1.35;
+  }
+  code {
+    background-color: #f1f5f9;
+    color: #0f172a;
+    padding: 1.5px 4px;
+    border-radius: 4px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 8px 0 12px 0;
+    font-size: 8.5pt;
+  }
+  th, td {
+    border: 1px solid #cbd5e1;
+    padding: 6px 8px;
+    text-align: left;
+    vertical-align: top;
+  }
+  th {
+    background-color: #f1f5f9;
+    font-weight: 700;
+    color: #1e293b;
+  }
+  tr:nth-child(even) td {
+    background-color: #f8fafc;
+  }
+  .flow-box {
+    background-color: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-radius: 6px;
+    padding: 6px 12px;
+    margin: 8px 0;
+    font-weight: 600;
+    color: #1d4ed8;
+    text-align: center;
+    font-size: 9.5pt;
+  }
+  .highlight-card {
+    background-color: #f8fafc;
+    border-left: 3px solid #3b82f6;
+    padding: 6px 10px;
+    margin: 6px 0;
+    border-radius: 0 6px 6px 0;
+    font-size: 9.5pt;
+  }
+  .highlight-card strong { color: #1e40af; }
+  .badge {
+    display: inline-block;
+    padding: 2px 7px;
+    font-size: 8pt;
+    font-weight: 700;
+    border-radius: 4px;
+    background: #dbeafe;
+    color: #1e40af;
+  }
+  .page-break { page-break-before: always; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Design Note: Low-Level Design (LLD) Practice Platform</h1>
+  <div class="meta">
+    <span><strong>Author:</strong> Govind Kumar</span>
+    <span><strong>Date:</strong> October 2026</span>
+    <span><strong>Assignment:</strong> 2-Day Engineering Prototype</span>
+  </div>
+</div>
+
+<h2>1. System Overview & Practice Loop</h2>
+<p>
+  The platform is designed around the core learner iteration cycle, prioritizing <strong>explainable, evidence-backed architectural feedback</strong> and <strong>rapid re-attempt learning</strong>:
+</p>
+<div class="flow-box">
+  Choose Problem &rarr; Design Code &amp; Notes &rarr; Submit &rarr; Rubric Scorecard &rarr; Inspect Dynamic UML &rarr; Iterate Attempt
+</div>
+
+<h2>2. Core Domain Model & Decoupled Architecture</h2>
+<p>The domain model cleanly separates problem specification, candidate submission, persistence lifecycle, and evaluation pipelines:</p>
+
+<pre>
+┌─────────────────┐       1..*       ┌───────────────────┐
+│     Problem     │ ◄─────────────── │      Attempt      │
+│  - ID           │                  │  - ID             │
+│  - Title        │                  │  - Status         │
+│  - Difficulty   │                  │  - Submission     │
+│  - Skeleton     │                  │  - Result         │
+└─────────────────┘                  └─────────┬─────────┘
+                                               │ Evaluates
+                                               ▼
+                                     ┌───────────────────┐
+                                     │  Evaluator (IF)   │
+                                     └─────────▲─────────┘
+                                               │
+                      ┌────────────────────────┴────────────────────────┐
+                      │                                                 │
+            ┌───────────────────┐                             ┌───────────────────┐
+            │ DeterministicEval │                             │  CompositeEval    │
+            │  (Rules & UML)    │                             │ (Chained Pipeline)│
+            └───────────────────┘                             └───────────────────┘
+</pre>
+
+<h3>Key Domain Entities:</h3>
+<ul>
+  <li><strong><code>Problem</code>:</strong> Encapsulates scenario metadata, difficulty, description, and initial class skeleton.</li>
+  <li><strong><code>Submission</code>:</strong> Encapsulates candidate payload with format abstraction (<code>FormatCodeAndNotes</code>, <code>FormatClassDiagram</code>, <code>FormatSpecification</code>).</li>
+  <li><strong><code>Attempt</code>:</strong> Models practice iterations, owning an explicit state lifecycle: <code>SUBMITTED &rarr; EVALUATING &rarr; COMPLETED / FAILED</code>.</li>
+  <li><strong><code>Evaluator</code> (Interface):</strong> Core architectural contract decoupling evaluation logic from HTTP and storage layers.</li>
+  <li><strong><code>RubricDimension</code>:</strong> 5-point structured feedback unit: <code>Criterion &rarr; Score &rarr; Evidence &rarr; Concern &rarr; Suggestion &rarr; Confidence</code>.</li>
+</ul>
+
+<div class="page-break"></div>
+
+<h2>3. Addressing the Assignment's Two Critical "Change Tests"</h2>
+
+<div class="highlight-card">
+  <strong>Change Test A: Changing Submission Format</strong><br/>
+  <em>"Today the learner submits text/code. Later the platform supports a class diagram. How much of your domain model changes?"</em>
+  <p style="margin-top: 4px;">
+    <strong>Design Solution:</strong> The domain introduces <code>SubmissionFormat</code> as an explicit enum abstraction. The <code>Submission</code> entity defines:
+  </p>
+<pre>
+type Submission struct {
+    ProblemID   int              `json:"problem_id"`
+    Format      SubmissionFormat `json:"format,omitempty"`
+    CodeContent string           `json:"code_content"`
+    DesignNotes string           `json:"design_notes"`
+    DiagramData string           `json:"diagram_data,omitempty"`
+}
+</pre>
+  <p>
+    <strong>Impact:</strong> Adding visual class diagrams or specifications requires <strong>zero changes</strong> to <code>Problem</code>, <code>Attempt</code>, or database tables. A new diagram parser strategy simply evaluates <code>DiagramData</code>.
+  </p>
+</div>
+
+<div class="highlight-card">
+  <strong>Change Test B: Adding New Evaluation Strategies</strong><br/>
+  <em>"Today feedback comes from one evaluator. Later you add a rule-based evaluator, human review, or an LLM. Can you add it without rewriting the practice flow?"</em>
+  <p style="margin-top: 4px;">
+    <strong>Design Solution:</strong> The Open/Closed Principle is applied via the <code>Evaluator</code> interface and Composite Pattern:
+  </p>
+<pre>
+type Evaluator interface {
+    Name() string
+    Evaluate(ctx context.Context, sub Submission, prob Problem) (EvaluationResult, error)
+}
+</pre>
+  <p>
+    <strong>Impact:</strong> Chaining an LLM or AST evaluator only requires implementing <code>Evaluator</code> and calling <code>composite.AddEvaluator(newEval)</code>. The HTTP handlers and persistence logic remain completely untouched.
+  </p>
+</div>
+
+<h2>4. Answers to Core Design Questions (Section 4)</h2>
+<ul>
+  <li><strong>Q1: What does a learner provide?</strong> Classes/interfaces (demonstrating encapsulation and hierarchy) + architectural notes (justifying trade-offs, concurrency handling, and pattern selection).</li>
+  <li><strong>Q2: What makes feedback useful when multiple valid solutions exist?</strong> Evaluating across multi-dimensional criteria (SRP, DIP/ISP, Extensibility, Concurrency) and citing concrete code evidence rather than comparing against a rigid template.</li>
+  <li><strong>Q3: Deterministic vs. LLM benefits:</strong> Deterministic rules excel at syntax validity, domain mismatch rejection, and dynamic UML parsing. LLMs excel at nuanced semantic review and qualitative trade-off critique.</li>
+  <li><strong>Q4: Handling slow/failing evaluations:</strong> Submissions are persisted in SQLite with status <code>EVALUATING</code> before processing begins, guarded by a 10-second Go <code>context.WithTimeout</code>, preventing candidate data loss on pipeline timeouts.</li>
+</ul>
+
+<h2>5. Key Engineering Trade-offs</h2>
+<table>
+  <thead>
+    <tr>
+      <th style="width: 20%;">Decision</th>
+      <th style="width: 25%;">Chosen Approach</th>
+      <th style="width: 25%;">Alternative Considered</th>
+      <th style="width: 30%;">Engineering Rationale</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Architecture</strong></td>
+      <td>Go Monolith (Fiber)</td>
+      <td>Microservices (API + Worker)</td>
+      <td>Minimizes operational complexity for MVP; sub-millisecond local execution without distributed failure points.</td>
+    </tr>
+    <tr>
+      <td><strong>Storage</strong></td>
+      <td>SQLite (WAL Mode)</td>
+      <td>PostgreSQL / MongoDB</td>
+      <td>Zero-configuration local persistence with ACID guarantees and complete portability.</td>
+    </tr>
+    <tr>
+      <td><strong>UML Rendering</strong></td>
+      <td>Dynamic client-side Mermaid.js</td>
+      <td>Server-side Graphviz/PlantUML</td>
+      <td>Parses AST tokens directly from code into interactive SVG diagrams without external binary dependencies.</td>
+    </tr>
+  </tbody>
+</table>
+
+</body>
+</html>

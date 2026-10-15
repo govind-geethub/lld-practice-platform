@@ -83,8 +83,8 @@ go test -v ./...
 
 ## 📝 Evaluation Deliverables Checklist
 
-- [x] **Research Note:** [`docs/RESEARCH_NOTE.md`](file:///c:/Users/bente/gov/lld-practice-platform/docs/RESEARCH_NOTE.md)
-- [x] **Design Note:** [`docs/DESIGN_NOTE.md`](file:///c:/Users/bente/gov/lld-practice-platform/docs/DESIGN_NOTE.md)
+- [x] **Research Note:** [`docs/RESEARCH_NOTE.md`](docs/RESEARCH_NOTE.md)
+- [x] **Design Note:** [`docs/DESIGN_NOTE.md`](docs/DESIGN_NOTE.md)
 - [x] **Working Prototype:** Demonstrable end-to-end loop from problem selection to rubric feedback and attempt history.
-- [x] **Tests:** Comprehensive tests in [`evaluator_test.go`](file:///c:/Users/bente/gov/lld-practice-platform/evaluator_test.go).
-- [x] **README & AI_USAGE.md:** Full setup guide and engineering discernment documented in [`AI_USAGE.md`](file:///c:/Users/bente/gov/lld-practice-platform/AI_USAGE.md).
+- [x] **Tests:** Comprehensive tests in [`evaluator_test.go`](evaluator_test.go).
+- [x] **README & AI_USAGE.md:** Full setup guide and engineering discernment documented in [`AI_USAGE.md`](AI_USAGE.md).

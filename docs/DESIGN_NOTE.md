@@ -1,7 +1,7 @@
 # Design Note: Low-Level Design (LLD) Practice Platform
 
-**Author:** Engineering Candidate  
-**Date:** September 2026  
+**Author:** Govind Kumar  
+**Date:** October 2026  
 **Assignment:** 2-Day Engineering Prototype  
 
 ---

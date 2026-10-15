@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>README & AI Usage Report - LLD Practice Platform</title>
+<style>
+  @page {
+    size: A4;
+    margin: 16mm 18mm;
+  }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: #1e293b;
+    line-height: 1.5;
+    font-size: 9.5pt;
+    margin: 0;
+    padding: 0;
+  }
+  .header {
+    border-bottom: 2.5px solid #2563eb;
+    padding-bottom: 8px;
+    margin-bottom: 14px;
+  }
+  h1 {
+    font-size: 16pt;
+    color: #0f172a;
+    margin: 0 0 4px 0;
+    letter-spacing: -0.02em;
+    font-weight: 800;
+  }
+  .meta {
+    font-size: 9pt;
+    color: #64748b;
+    display: flex;
+    gap: 20px;
+  }
+  h2 {
+    font-size: 12pt;
+    color: #1e3a8a;
+    border-left: 3.5px solid #2563eb;
+    padding-left: 8px;
+    margin: 14px 0 6px 0;
+    font-weight: 700;
+  }
+  h3 {
+    font-size: 10.5pt;
+    color: #0f172a;
+    margin: 10px 0 4px 0;
+    font-weight: 700;
+  }
+  p { margin: 0 0 6px 0; }
+  ul { margin: 0 0 8px 0; padding-left: 18px; }
+  li { margin-bottom: 3px; }
+  pre, code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 8.5pt;
+  }
+  pre {
+    background-color: #0f172a;
+    color: #38bdf8;
+    padding: 8px 12px;
+    border-radius: 6px;
+    overflow-x: auto;
+    margin: 6px 0 10px 0;
+    line-height: 1.35;
+  }
+  code {
+    background-color: #f1f5f9;
+    color: #0f172a;
+    padding: 1px 4px;
+    border-radius: 4px;
+  }
+  .card {
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 10px 12px;
+    margin: 8px 0;
+  }
+  .card-title {
+    font-weight: 700;
+    color: #1e40af;
+    margin-bottom: 4px;
+    font-size: 10pt;
+  }
+  .badge-rejected {
+    background: #fee2e2;
+    color: #991b1b;
+    font-weight: 700;
+    font-size: 8pt;
+    padding: 1.5px 6px;
+    border-radius: 4px;
+  }
+  .badge-accepted {
+    background: #dcfce7;
+    color: #166534;
+    font-weight: 700;
+    font-size: 8pt;
+    padding: 1.5px 6px;
+    border-radius: 4px;
+  }
+  .page-break { page-break-before: always; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>PART I: Project Documentation & Quick Start (README)</h1>
+  <div class="meta">
+    <span><strong>Author:</strong> Govind Kumar</span>
+    <span><strong>Repository:</strong> https://github.com/govind-geethub/lld-practice-platform</span>
+    <span><strong>Tech Stack:</strong> Go (1.22+), Fiber, SQLite, Tailwind, Mermaid.js</span>
+  </div>
+</div>
+
+<h2>1. Overview</h2>
+<p>
+  An engineering practice platform designed to help learners iteratively practice Low-Level Design (LLD), submit class hierarchies and architectural notes, receive explainable rubric-driven feedback, and track design evolution across attempts. Built in strict accordance with the <strong>LLD Practice Platform 2-Day Engineering Assignment</strong> and <strong>Candidate Helping Guide</strong>.
+</p>
+
+<h2>2. Key Architectural Features</h2>
+<ul>
+  <li><strong>Iterative Practice Loop:</strong> Choose Problem &rarr; Design Code &amp; Notes &rarr; Submit &rarr; Explainable Rubric Feedback &rarr; Attempt History &rarr; Iterate.</li>
+  <li><strong>Multi-Dimensional Rubric Engine:</strong> 4 structured dimensions (Single Responsibility, Abstraction & Loose Coupling, Design Patterns, Concurrency & State Safety) with explicit Evidence, Concern, Suggestion, and Confidence.</li>
+  <li><strong>Passes Change Tests A & B:</strong> Decoupled <code>SubmissionFormat</code> abstraction and pluggable <code>Evaluator</code> interface with <code>CompositeEvaluator</code> pipeline.</li>
+  <li><strong>Resilient Submission Lifecycle:</strong> Submissions persisted in <code>EVALUATING</code> state before evaluation begins with Go context timeout protection.</li>
+  <li><strong>Dynamic UML Diagram Generation:</strong> Parses class and interface hierarchies directly from candidate code to render interactive Mermaid.js diagrams.</li>
+</ul>
+
+<h2>3. Quick Start & Execution Guide</h2>
+<pre>
+# 1. Clone repository
+git clone https://github.com/govind-geethub/lld-practice-platform.git
+cd lld-practice-platform
+
+# 2. Run Go backend server (runs on port 8080)
+go run .
+
+# 3. Access in browser
+Open http://localhost:8080
+
+# 4. Run automated test suite
+go test -v ./...
+</pre>
+
+<h2>4. Automated Test Verification</h2>
+<p>All core domain logic, evaluators, pipeline chaining, and edge cases are verified with unit tests:</p>
+<pre>
+=== RUN   TestDeterministicEvaluator_PassingDesign       --- PASS (0.00s)
+=== RUN   TestDeterministicEvaluator_DomainMismatchRejection --- PASS (0.00s)
+=== RUN   TestCompositeEvaluator_PipelineChaining        --- PASS (0.00s)
+=== RUN   TestDynamicUMLParser                           --- PASS (0.00s)
+=== RUN   TestEvaluateDesignLegacyCompatibility          --- PASS (0.00s)
+PASS
+</pre>
+
+<div class="page-break"></div>
+
+<div class="header">
+  <h1>PART II: AI Usage Report (AI_USAGE.md)</h1>
+  <div class="meta">
+    <span><strong>Document:</strong> Engineering Discernment & AI-Assisted Architectural Decisions</span>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-title">Decision 1: Evaluation Architecture — Multi-Dimensional Rubric vs. Freeform LLM Prompt</div>
+  <p><strong>AI Suggestion:</strong> Delegate evaluation to an unconstrained LLM prompt: <em>"Evaluate this LLD solution 1-100 and say if it's good."</em></p>
+  <p><span class="badge-rejected">REJECTED</span> <strong>Rationale:</strong> Violates Helping Guide principles. Unconstrained LLM prompts produce inconsistent, ungrounded numbers, hallucinate critiques, and fail during network outages.</p>
+  <p><span class="badge-accepted">ADOPTED ALTERNATIVE</span> Implemented a hybrid pipeline: deterministic validator for domain keywords and god classes, coupled with a 4-dimensional rubric (Criterion &rarr; Score &rarr; Evidence &rarr; Concern &rarr; Suggestion &rarr; Confidence).</p>
+</div>
+
+<div class="card">
+  <div class="card-title">Decision 2: Extensibility Architecture — Pluggable Interface vs. Monolithic Function</div>
+  <p><strong>AI Suggestion:</strong> Write a single monolithic regex validation function inside <code>main.go</code>.</p>
+  <p><span class="badge-rejected">REJECTED</span> <strong>Rationale:</strong> Violates <strong>Change Test B</strong>. Tightly couples evaluation rules to HTTP routing, preventing future AI or human evaluators from being added without rewriting practice handlers.</p>
+  <p><span class="badge-accepted">ADOPTED ALTERNATIVE</span> Defined the <code>Evaluator</code> interface and <code>CompositeEvaluator</code> pattern. New evaluators implement the interface and register in the pipeline with zero changes to HTTP handlers or database persistence.</p>
+</div>
+
+<div class="card">
+  <div class="card-title">Decision 3: Resilience & State Lifecycle — Pre-Evaluation Persistence vs. Synchronous POST</div>
+  <p><strong>AI Suggestion:</strong> Evaluate synchronously in the POST handler and return the JSON result immediately without recording state.</p>
+  <p><span class="badge-rejected">REJECTED</span> <strong>Rationale:</strong> If an evaluator times out, crashes, or exhausts API tokens, candidate code is permanently lost. Violates Section 10 Helping Guide requirement.</p>
+  <p><span class="badge-accepted">ADOPTED ALTERNATIVE</span> Explicit state machine: <code>SUBMITTED &rarr; EVALUATING &rarr; COMPLETED / FAILED</code>. Pre-saves to SQLite with status <code>EVALUATING</code> before invoking the pipeline under a 10-second Go <code>context.WithTimeout</code>.</p>
+</div>
+
+<div class="card">
+  <div class="card-title">Decision 4: Dynamic Architecture Diagramming — Code-Extracted UML vs. Static Template</div>
+  <p><strong>AI Suggestion:</strong> Return a static pre-drawn Mermaid diagram of generic Manager-Strategy patterns.</p>
+  <p><span class="badge-rejected">REJECTED</span> <strong>Rationale:</strong> Static diagrams fail to show learners how their specific classes relate or how refactoring changed their architecture.</p>
+  <p><span class="badge-accepted">ADOPTED ALTERNATIVE</span> Implemented <code>generateDynamicUML()</code> to parse actual classes, interfaces, and dependencies directly from candidate code and render live Mermaid.js diagrams.</p>
+</div>
+
+<div class="card">
+  <div class="card-title">Decision 5: Architecture Scope — Clean Monolith vs. Distributed Microservices</div>
+  <p><strong>AI Suggestion:</strong> Spin up Go API Gateway, Python evaluation worker, Redis queue, and PostgreSQL.</p>
+  <p><span class="badge-rejected">REJECTED</span> <strong>Rationale:</strong> The brief explicitly emphasizes domain modeling over infrastructure complexity. Microservices introduce unnecessary failure modes and deployment friction for a 2-day MVP.</p>
+  <p><span class="badge-accepted">ADOPTED ALTERNATIVE</span> Single modular Go monolith using Fiber and SQLite. Boots in milliseconds with zero dependencies and pristine domain separation.</p>
+</div>
+
+</body>
+</html>

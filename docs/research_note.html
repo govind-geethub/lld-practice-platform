@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Research Note: Low-Level Design Practice Platform</title>
+<style>
+  @page {
+    size: A4;
+    margin: 16mm 18mm;
+  }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: #1e293b;
+    line-height: 1.5;
+    font-size: 10.5pt;
+    margin: 0;
+    padding: 0;
+  }
+  .header {
+    border-bottom: 2.5px solid #2563eb;
+    padding-bottom: 8px;
+    margin-bottom: 16px;
+  }
+  h1 {
+    font-size: 18pt;
+    color: #0f172a;
+    margin: 0 0 6px 0;
+    letter-spacing: -0.02em;
+    font-weight: 800;
+  }
+  .meta {
+    font-size: 9.5pt;
+    color: #64748b;
+    display: flex;
+    gap: 20px;
+    margin-bottom: 4px;
+  }
+  .meta strong { color: #334155; }
+  h2 {
+    font-size: 12.5pt;
+    color: #1e3a8a;
+    border-left: 3.5px solid #2563eb;
+    padding-left: 8px;
+    margin: 16px 0 8px 0;
+    font-weight: 700;
+  }
+  p {
+    margin: 0 0 8px 0;
+  }
+  ul, ol {
+    margin: 0 0 10px 0;
+    padding-left: 20px;
+  }
+  li {
+    margin-bottom: 4px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0 14px 0;
+    font-size: 9pt;
+  }
+  th, td {
+    border: 1px solid #cbd5e1;
+    padding: 7px 10px;
+    text-align: left;
+    vertical-align: top;
+  }
+  th {
+    background-color: #f1f5f9;
+    font-weight: 700;
+    color: #1e293b;
+  }
+  tr:nth-child(even) td {
+    background-color: #f8fafc;
+  }
+  .flow-box {
+    background-color: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-radius: 6px;
+    padding: 8px 14px;
+    margin: 10px 0;
+    font-weight: 600;
+    color: #1d4ed8;
+    text-align: center;
+    font-size: 10pt;
+  }
+  .highlight-card {
+    background-color: #f8fafc;
+    border-left: 3px solid #3b82f6;
+    padding: 8px 12px;
+    margin: 8px 0;
+    border-radius: 0 6px 6px 0;
+  }
+  .highlight-card strong { color: #1e40af; }
+  strong { color: #0f172a; }
+  .page-break { page-break-before: always; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Research Note: Low-Level Design (LLD) Practice & Evaluation Platform</h1>
+  <div class="meta">
+    <span><strong>Candidate:</strong> Govind Kumar</span>
+    <span><strong>Date:</strong> October 2026</span>
+    <span><strong>Focus:</strong> 2-Day Engineering Prototype</span>
+  </div>
+</div>
+
+<h2>1. The Core Learner Problem</h2>
+<p>
+  Practicing Data Structures & Algorithms (DSA) follows a well-defined, deterministic loop: a learner implements code against defined unit tests, receives immediate binary execution feedback (Pass/Fail), and optimizes runtime/space complexity.
+</p>
+<p>
+  In contrast, <strong>practicing Low-Level Design (LLD) is fraught with ambiguity</strong>:
+</p>
+<ul>
+  <li><strong>Subjective & Multi-Faceted Solutions:</strong> Unlike algorithms with a single deterministic output, an LLD problem (e.g., <em>Parking Lot</em>, <em>Elevator System</em>, <em>Movie Ticket Booking</em>) has dozens of valid implementations. An Elevator can leverage a State Pattern or Command Pattern; both can be effective depending on design trade-offs.</li>
+  <li><strong>Evaluation Void:</strong> Learners write class hierarchies and architectural notes, but remain unsure whether:
+    <ul>
+      <li>Class responsibilities adhere to the Single Responsibility Principle (SRP) or form "God Classes".</li>
+      <li>Coupling between high-level orchestration and low-level entities is sufficiently loose (Dependency Inversion Principle).</li>
+      <li>Concurrency, thread-safety, and state synchronization were addressed soundly.</li>
+    </ul>
+  </li>
+  <li><strong>Absence of an Iterative Learning Loop:</strong> Existing resources treat LLD as static reading. Candidates read pre-baked reference solutions and attempt to memorize class diagrams, failing to develop the iterative architectural muscle needed to refine a design based on targeted critique.</li>
+</ul>
+
+<h2>2. Competitive Landscape & Gaps in Existing Tools</h2>
+<table>
+  <thead>
+    <tr>
+      <th style="width: 22%;">Platform / Tool</th>
+      <th style="width: 24%;">Typical Workflow</th>
+      <th style="width: 24%;">Feedback Provided</th>
+      <th style="width: 30%;">Critical Gap / Failure Mode</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>LeetCode / HackerRank</strong></td>
+      <td>Run code against unit test suites.</td>
+      <td>Pass/Fail boolean & runtime latency (ms).</td>
+      <td><strong>Completely unsuitable for LLD.</strong> Only evaluates algorithmic output, ignoring object modeling, interfaces, coupling, or design patterns.</td>
+    </tr>
+    <tr>
+      <td><strong>Educative / Grokking LLD</strong></td>
+      <td>Static reading of reference class diagrams and code.</td>
+      <td>Static text and diagrams.</td>
+      <td><strong>Zero interactive practice.</strong> The learner cannot submit variations or receive feedback on their specific trade-offs.</td>
+    </tr>
+    <tr>
+      <td><strong>Generic LLMs (ChatGPT / Claude)</strong></td>
+      <td>Freeform chat prompt with pasted code.</td>
+      <td>Unconstrained text critique and arbitrary scores (e.g., "8/10").</td>
+      <td><strong>Inconsistent and hallucination-prone.</strong> Lacks standardized engineering rubrics; provides ungrounded scores without citing concrete evidence or identifying domain mismatch.</td>
+    </tr>
+    <tr>
+      <td><strong>GitHub Repositories</strong></td>
+      <td>Browse curated implementations.</td>
+      <td>None (static code reference).</td>
+      <td>Encourages rote memorization rather than active design synthesis or iterative refinement.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>3. Key Product Insights & Gaps Identified</h2>
+<div class="highlight-card">
+  <strong>1. Multi-Dimensional Rubric Assessment:</strong> Feedback cannot be a single arbitrary score. Useful evaluation must dissect designs across standard engineering dimensions: <em>Single Responsibility & Cohesion (SRP)</em>, <em>Abstraction & Loose Coupling (DIP/ISP)</em>, <em>Design Patterns & Extensibility (OCP)</em>, and <em>Concurrency Safety & State Management</em>.
+</div>
+<div class="highlight-card">
+  <strong>2. Evidence-Based Explanations:</strong> To be actionable, every critique must cite <strong>concrete evidence</strong> directly from the candidate's code, explain the structural concern, and suggest an actionable improvement for their next iteration.
+</div>
+<div class="highlight-card">
+  <strong>3. Iterative Learning Loop (Attempt History):</strong> The platform must persist historical attempts so learners can compare Attempt #1 with Attempt #2, observing how extracting an interface or adding synchronization directly impacts their scorecard.
+</div>
+
+<h2>4. Product Direction & MVP Scope</h2>
+<p>Our prototype centers on the complete <strong>Learner Journey</strong>:</p>
+<div class="flow-box">
+  Choose Problem &rarr; Design Code &amp; Notes &rarr; Submit &rarr; Explainable Rubric Scorecard &rarr; Dynamic UML &rarr; Iterate Attempt
+</div>
+
+<ul>
+  <li><strong>Lightweight Go Monolith:</strong> High-performance modular architecture using Go and Fiber, booting instantly with zero operational overhead.</li>
+  <li><strong>Hybrid Decoupled Evaluation Pipeline:</strong>
+    <ul>
+      <li><em>Deterministic Rule Engine:</em> Prevents cross-problem contamination, evaluates structural keywords, and dynamically generates Mermaid.js UML class diagrams directly from candidate code.</li>
+      <li><em>Pluggable Evaluator Interface:</em> Satisfies <strong>Change Test B</strong>, allowing external LLM evaluators, AST analyzers, or human reviewers to be chained seamlessly.</li>
+    </ul>
+  </li>
+  <li><strong>Resilient Submission Lifecycle:</strong> Submissions are persisted immediately with status <code>EVALUATING</code> before processing starts, protected by Go context timeouts, preventing candidate data loss upon evaluator failure.</li>
+</ul>
+
+</body>
+</html>
